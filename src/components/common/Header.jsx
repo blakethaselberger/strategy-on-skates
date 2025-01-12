@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, Tabs, Tab, Menu, MenuItem, Drawer, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Tabs, Tab, Menu, MenuItem, Drawer, List, ListItemButton, ListItemText } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Search from './Search'; // Ensure path is correct
 import StyledIconButton from './StyledIconButton'; // Import the new component
 import Collapse from '@mui/material/Collapse';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 const Header = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [value, setValue] = useState(0);
     const [toolsAnchorEl, setToolsAnchorEl] = useState(null); // For desktop dropdown
     const [openTools, setOpenTools] = useState(false); // For mobile drawer submenu
+    const navigate = useNavigate(); // Initialize navigate
 
     const handleDrawerOpen = () => {
         setDrawerOpen(true);
@@ -38,13 +40,22 @@ const Header = () => {
         setValue(newValue);
     };
 
+    const handleNavigate = (path) => {
+        navigate(path); // Navigate to the provided path
+        handleDrawerClose(); // Close the drawer if it's open
+    };
+
     return (
         <AppBar position="static" color="primary">
             <Toolbar>
                 <StyledIconButton onClick={handleDrawerOpen}>
                     <MenuIcon />
                 </StyledIconButton>
-                <Typography variant="h6" sx={{ flexGrow: 0, display: { xs: 'none', md: 'block' } }}>
+                <Typography
+                    variant="h6"
+                    sx={{ flexGrow: 0, display: { xs: 'none', md: 'block' }, cursor: 'pointer' }}
+                    onClick={() => handleNavigate('/')} // Navigates to Home
+                >
                     Strategy on Skates
                 </Typography>
                 <Tabs
@@ -55,7 +66,11 @@ const Header = () => {
                     indicatorColor="primary"
                     textColor="inherit"
                 >
-                    <Tab label="Tools" onClick={handleToolsClick} aria-haspopup="true" />
+                    <Tab
+                        label="Tools"
+                        onClick={handleToolsClick}
+                        aria-haspopup="true"
+                    />
                     <Tab label="Betting" />
                     <Tab label="Players" />
                     <Tab label="Models" />
@@ -66,7 +81,8 @@ const Header = () => {
                     open={Boolean(toolsAnchorEl)}
                     onClose={handleToolsClose}
                 >
-                    <MenuItem onClick={handleToolsClose}>Draft Simulator</MenuItem>
+                    {/* Navigate to Draft Simulator */}
+                    <MenuItem onClick={() => handleNavigate('/draft-simulator')}>Draft Simulator</MenuItem>
                     <MenuItem onClick={handleToolsClose}>GM Mode</MenuItem>
                 </Menu>
                 <Search sx={{ display: { xs: 'none', md: 'flex' } }} />
@@ -80,7 +96,7 @@ const Header = () => {
                         </ListItemButton>
                         <Collapse in={openTools} timeout="auto" unmountOnExit>
                             <List component="div" disablePadding>
-                                <ListItemButton sx={{ pl: 4 }}>
+                                <ListItemButton sx={{ pl: 4 }} onClick={() => handleNavigate('/draft-simulator')}>
                                     <ListItemText primary="Draft Simulator" />
                                 </ListItemButton>
                                 <ListItemButton sx={{ pl: 4 }}>

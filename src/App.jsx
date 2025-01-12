@@ -1,15 +1,26 @@
 import React from 'react';
-import Header from './components/common/Header';
-import Footer from './components/common/Footer';
-import Home from './components/features/Home';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/common/Header'; // Ensure the path is correct
+import Home from './components/features/Home'; // Ensure the path is correct
+import Footer from './components/common/Footer'; // Ensure the path is correct
+import DraftSimulator from './components/pages/DraftSimulator'; // Ensure path is correct
 
 const App = () => (
-  <div>
-    {/* <AppAppBar>Poop</AppAppBar> */}
-    <Header />
-    <Home />
-    <Footer />
-  </div>
+  <Router>
+    <div>
+      {/* Header Component */}
+      <Header />
+      {/* Main Content */}
+      <Routes>
+        {/* Home Route */}
+        <Route path="/" element={<Home />} />
+        {/* Draft Simulator Route */}
+        <Route path="/draft-simulator" element={<DraftSimulator />} />
+      </Routes>
+      {/* Footer Component */}
+      <Footer />
+    </div>
+  </Router>
 );
 
 export default App;
