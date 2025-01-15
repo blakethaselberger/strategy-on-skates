@@ -1,17 +1,34 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, Tabs, Tab, Menu, MenuItem, Drawer, List, ListItemButton, ListItemText } from '@mui/material';
+import {
+    AppBar,
+    Toolbar,
+    Typography,
+    Button,
+    Tabs,
+    Tab,
+    Menu,
+    MenuItem,
+    Drawer,
+    List,
+    ListItemButton,
+    ListItemText,
+    IconButton,
+    Collapse,
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Search from './Search'; // Ensure path is correct
 import StyledIconButton from './StyledIconButton'; // Import the new component
-import Collapse from '@mui/material/Collapse';
+import DarkModeIcon from '@mui/icons-material/DarkMode'; // Icon for theme toggle
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 const Header = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [value, setValue] = useState(0);
     const [toolsAnchorEl, setToolsAnchorEl] = useState(null); // For desktop dropdown
+    const [themeAnchorEl, setThemeAnchorEl] = useState(null); // For theme dropdown
+    const [colorScheme, setColorScheme] = useState('light'); // Manage theme state
     const [openTools, setOpenTools] = useState(false); // For mobile drawer submenu
     const navigate = useNavigate(); // Initialize navigate
 
@@ -34,6 +51,20 @@ const Header = () => {
 
     const handleToolsClose = () => {
         setToolsAnchorEl(null);
+    };
+
+    const handleThemeClick = (event) => {
+        setThemeAnchorEl(event.currentTarget); // Open theme menu
+    };
+
+    const handleThemeClose = () => {
+        setThemeAnchorEl(null); // Close theme menu
+    };
+
+    const handleThemeChange = (scheme) => {
+        setColorScheme(scheme);
+        document.documentElement.setAttribute('data-mui-color-scheme', scheme); // Apply theme
+        handleThemeClose();
     };
 
     const handleChange = (event, newValue) => {
@@ -81,11 +112,22 @@ const Header = () => {
                     open={Boolean(toolsAnchorEl)}
                     onClose={handleToolsClose}
                 >
-                    {/* Navigate to Draft Simulator */}
                     <MenuItem onClick={() => handleNavigate('/draft-simulator')}>Draft Simulator</MenuItem>
                     <MenuItem onClick={handleToolsClose}>GM Mode</MenuItem>
                 </Menu>
                 <Search sx={{ display: { xs: 'none', md: 'flex' } }} />
+                <IconButton onClick={handleThemeClick} color="inherit">
+                    <DarkModeIcon />
+                </IconButton>
+                <Menu
+                    id="theme-menu"
+                    anchorEl={themeAnchorEl}
+                    open={Boolean(themeAnchorEl)}
+                    onClose={handleThemeClose}
+                >
+                    <MenuItem onClick={() => handleThemeChange('light')}>Light Mode</MenuItem>
+                    <MenuItem onClick={() => handleThemeChange('dark')}>Dark Mode</MenuItem>
+                </Menu>
                 <Button color="inherit" sx={{ display: { xs: 'none', md: 'block' } }}>Login</Button>
                 <Button color="inherit" sx={{ display: { xs: 'none', md: 'block' } }}>Signup</Button>
                 <Drawer anchor="top" open={drawerOpen} onClose={handleDrawerClose}>

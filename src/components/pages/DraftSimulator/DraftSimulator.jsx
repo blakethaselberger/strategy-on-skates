@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Grid,
@@ -10,56 +10,29 @@ import {
     FormControlLabel,
     Switch,
 } from '@mui/material';
-import SportsHockeyIcon from '@mui/icons-material/SportsHockey'; // Placeholder icon
-
-const teams = [
-    { name: 'Anaheim Ducks', id: 1, pick: 1 },
-    { name: 'Arizona Coyotes', id: 2, pick: 2 },
-    { name: 'Boston Bruins', id: 3, pick: 3 },
-    { name: 'Buffalo Sabres', id: 4, pick: 4 },
-    { name: 'Calgary Flames', id: 5, pick: 5 },
-    { name: 'Carolina Hurricanes', id: 6, pick: 6 },
-    { name: 'Chicago Blackhawks', id: 7, pick: 7 },
-    { name: 'Colorado Avalanche', id: 8, pick: 8 },
-    { name: 'Columbus Blue Jackets', id: 9, pick: 9 },
-    { name: 'Dallas Stars', id: 10, pick: 10 },
-    { name: 'Detroit Red Wings', id: 11, pick: 11 },
-    { name: 'Edmonton Oilers', id: 12, pick: 12 },
-    { name: 'Florida Panthers', id: 13, pick: 13 },
-    { name: 'Los Angeles Kings', id: 14, pick: 14 },
-    { name: 'Minnesota Wild', id: 15, pick: 15 },
-    { name: 'Montreal Canadiens', id: 16, pick: 16 },
-    { name: 'Nashville Predators', id: 17, pick: 17 },
-    { name: 'New Jersey Devils', id: 18, pick: 18 },
-    { name: 'New York Islanders', id: 19, pick: 19 },
-    { name: 'New York Rangers', id: 20, pick: 20 },
-    { name: 'Ottawa Senators', id: 21, pick: 21 },
-    { name: 'Philadelphia Flyers', id: 22, pick: 22 },
-    { name: 'Pittsburgh Penguins', id: 23, pick: 23 },
-    { name: 'San Jose Sharks', id: 24, pick: 24 },
-    { name: 'Seattle Kraken', id: 25, pick: 25 },
-    { name: 'St. Louis Blues', id: 26, pick: 26 },
-    { name: 'Tampa Bay Lightning', id: 27, pick: 27 },
-    { name: 'Toronto Maple Leafs', id: 28, pick: 28 },
-    { name: 'Vancouver Canucks', id: 29, pick: 29 },
-    { name: 'Vegas Golden Knights', id: 30, pick: 30 },
-    { name: 'Washington Capitals', id: 31, pick: 31 },
-    { name: 'Winnipeg Jets', id: 32, pick: 32 },
-];
+import SportsHockeyIcon from '@mui/icons-material/SportsHockey';
+import { useNavigate } from 'react-router-dom';
+import teams from '../../../mock-data/teams.json';
 
 const DraftSimulator = () => {
     const [selectedTeams, setSelectedTeams] = useState([]);
     const [rounds, setRounds] = useState(7);
     const [randomness, setRandomness] = useState(50);
     const [draftNeeds, setDraftNeeds] = useState(50);
-    const [isLotteryEnabled, setIsLotteryEnabled] = useState(false); // Toggle for Draft Lottery
-    const [selectAll, setSelectAll] = useState(false); // Toggle for Select All Teams
+    const [isLotteryEnabled, setIsLotteryEnabled] = useState(false);
+    const [selectAll, setSelectAll] = useState(false);
+    const navigate = useNavigate();
 
     const toggleTeamSelection = (teamId) => {
-        if (selectedTeams.includes(teamId)) {
-            setSelectedTeams(selectedTeams.filter((id) => id !== teamId));
+        const team = teams.find((t) => t.id === teamId); // Find the team by ID
+        if (!team) return;
+
+        const teamName = team.name; // Use the team name
+
+        if (selectedTeams.includes(teamName)) {
+            setSelectedTeams(selectedTeams.filter((name) => name !== teamName));
         } else {
-            setSelectedTeams([...selectedTeams, teamId]);
+            setSelectedTeams([...selectedTeams, teamName]);
         }
     };
 
@@ -69,12 +42,19 @@ const DraftSimulator = () => {
 
     const handleSelectAllToggle = (event) => {
         setSelectAll(event.target.checked);
-        setSelectedTeams(event.target.checked ? teams.map((team) => team.id) : []);
+        setSelectedTeams(event.target.checked ? teams.map((team) => team.name) : []);
     };
 
     const handleLotteryToggle = (event) => {
         setIsLotteryEnabled(event.target.checked);
-        alert(`Draft Lottery is now ${event.target.checked ? 'enabled' : 'disabled'}.`);
+    };
+
+    const handleStartDraft = () => {
+        if (selectedTeams.length === 0) {
+            alert('Please select at least one team to start the draft.');
+            return;
+        }
+        navigate('/draft', { state: { selectedTeams } }); // Pass selected teams to DraftPage
     };
 
     return (
@@ -82,11 +62,10 @@ const DraftSimulator = () => {
             sx={{
                 display: 'flex',
                 justifyContent: 'center',
-                margin: '40px auto', // Outer margin for spacing
-                maxWidth: '80%', // Restrict the width of the layout
+                margin: '40px auto',
+                maxWidth: '80%',
             }}
         >
-            {/* Combined Grid and Settings in One Paper */}
             <Paper elevation={3} sx={{ width: '100%', padding: 3 }}>
                 <Typography variant="h6" gutterBottom>
                     Draft Simulator
@@ -99,7 +78,6 @@ const DraftSimulator = () => {
                         gap: 3,
                     }}
                 >
-                    {/* Left Side: Teams Grid */}
                     <Box sx={{ flex: 2 }}>
                         <Box
                             sx={{
@@ -156,15 +134,15 @@ const DraftSimulator = () => {
                                     <Button
                                         onClick={() => toggleTeamSelection(team.id)}
                                         sx={{
-                                            width: '100%', // Ensure buttons fill their grid cell
-                                            height: 70, // Shallow height for buttons
-                                            backgroundColor: selectedTeams.includes(team.id)
+                                            width: '100%',
+                                            height: 70,
+                                            backgroundColor: selectedTeams.includes(team.name)
                                                 ? 'rgba(0, 123, 255, 0.5)'
                                                 : 'transparent',
-                                            border: '1px solid rgba(0, 0, 0, 0.7)', // Updated to a darker outline
+                                            border: '1px solid rgba(0, 0, 0, 0.7)',
                                             display: 'flex',
-                                            justifyContent: 'space-between', // Align content horizontally
-                                            alignItems: 'center', // Align content vertically
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
                                             padding: 1,
                                             borderRadius: 1,
                                             textTransform: 'none',
@@ -173,41 +151,28 @@ const DraftSimulator = () => {
                                             },
                                         }}
                                     >
-                                        {/* Left Side: Pick Number and Team Name */}
                                         <Box sx={{ textAlign: 'left', marginLeft: 1 }}>
                                             <Typography
                                                 variant="body2"
-                                                sx={{
-                                                    fontWeight: 'bold',
-                                                    fontSize: '0.8rem',
-                                                }}
+                                                sx={{ fontWeight: 'bold', fontSize: '0.8rem' }}
                                             >
                                                 {team.pick}
                                             </Typography>
                                             <Typography
                                                 variant="body2"
-                                                sx={{
-                                                    fontSize: '0.7rem',
-                                                    lineHeight: 1.1,
-                                                }}
+                                                sx={{ fontSize: '0.7rem', lineHeight: 1.1 }}
                                             >
                                                 {team.name}
                                             </Typography>
                                         </Box>
-                                        {/* Right Side: Placeholder Icon */}
                                         <SportsHockeyIcon
-                                            style={{
-                                                fontSize: 28, // Slightly larger icon
-                                                marginRight: '5px',
-                                            }}
+                                            style={{ fontSize: 28, marginRight: '5px' }}
                                         />
                                     </Button>
                                 </Grid>
                             ))}
                         </Grid>
                     </Box>
-
-                    {/* Right Side: Draft Settings */}
                     <Box sx={{ flex: 1, marginLeft: 3 }}>
                         <Typography variant="h6" gutterBottom>
                             Draft Simulator Settings
@@ -246,11 +211,13 @@ const DraftSimulator = () => {
                                 valueLabelDisplay="auto"
                             />
                         </Box>
-                        <FormControlLabel
-                            control={<Checkbox />}
-                            label="Turbo Mode"
-                        />
-                        <Button variant="contained" color="primary" fullWidth>
+                        <FormControlLabel control={<Checkbox />} label="Turbo Mode" />
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            onClick={handleStartDraft}
+                        >
                             Start Draft
                         </Button>
                     </Box>
