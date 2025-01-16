@@ -3,41 +3,27 @@ import { Box, Paper, Typography } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import availablePlayersData from '../../../mock-data/availablePlayers.json';
 import initialTeamsData from '../../../mock-data/teams.json';
-import DraftSelections from './DraftSelections';
-import DraftView from './DraftView';
+import DraftSelections from './DraftSelectionView/DraftSelections';
+import DraftView from './DraftView/DraftView';
+import DraftPageHeader from './DraftPageHeader';
 
 const DraftPage = () => {
-
-    // var for maintaining list of teams user selected on prev page
     const location = useLocation();
     const selectedTeams = location.state?.selectedTeams || [];
 
-    // States for draft management
     const [draftSelections, setDraftSelections] = useState([]);
     const [availablePlayers, setAvailablePlayers] = useState(availablePlayersData);
-
-    //state for searching and filtering
     const [filteredPlayers, setFilteredPlayers] = useState(availablePlayersData);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filterPosition, setFilterPosition] = useState('All'); // Position filter for players
-
-    //Keeps track of pick index as it iterates through draft order. Note that pick will be currentPickIndex+1
+    const [filterPosition, setFilterPosition] = useState('All');
     const [currentPickIndex, setCurrentPickIndex] = useState(0);
-
-    //load NHL Team Data into mutable state
     const [teamsData, setTeamsData] = useState(initialTeamsData);
-
-    // State of the draft ('pre-draft', 'paused', 'in-between-picks', 'user-picking')
     const [draftState, setDraftState] = useState('pre-draft');
-
-    //Which User Team Selected is currently active (for handinlg sessions where the user selects multiple teams)
     const [userTeam, setUserTeam] = useState(
         selectedTeams.length > 0
             ? teamsData.find((team) => team.name === selectedTeams[0]) || {}
             : {}
     );
-
-    // Selected picks and players for trades
     const [selectedPicksForTrade, setSelectedPicksForTrade] = useState({
         yourPicks: [],
         theirPicks: [],
@@ -46,21 +32,18 @@ const DraftPage = () => {
         yourPlayers: [],
         theirPlayers: [],
     });
+    const [selectedTeamForTrade, setSelectedTeamForTrade] = useState(
+        teamsData[0]?.name === userTeam.name ? teamsData[1]?.name || '' : teamsData[0]?.name || ''
+    );
 
-    // Selected team for trades - Kinda wierd edge case I handled. If userTeam is teamData[0] e.g., you select the team with 1st overall, don't intiialize the team to trade with as yourself
-    const [selectedTeamForTrade, setSelectedTeamForTrade] = useState(teamsData[0]?.name === userTeam.name ? teamsData[1]?.name || '' : teamsData[0]?.name || '');
-
-    // Generates the draft order based on team picks
     const [teamOrder, setTeamOrder] = useState(() =>
         initialTeamsData
             .flatMap((team) => team.picks.map((pick) => ({ teamName: team.name, pick })))
             .sort((a, b) => a.pick - b.pick)
     );
 
-    /**
-     * Handles drafting a player.
-     * Updates available players, draft selections, team picks, and transitions to the next state.
-     */
+    const [draftSpeed, setDraftSpeed] = useState(1000);
+
     const handleDraftPlayer = (player, teamName) => {
         setAvailablePlayers((prevPlayers) =>
             prevPlayers.filter((p) => p.id !== player.id)
@@ -90,18 +73,15 @@ const DraftPage = () => {
         );
 
         setCurrentPickIndex((prevIndex) => prevIndex + 1);
-        setDraftState('in-between-picks'); // we may not need this
+        setDraftState('in-between-picks');
     };
 
-    /**
-     * Handles trades between teams.
-     */
     const handleTrade = () => {
         const { yourPicks, theirPicks } = selectedPicksForTrade;
         const { yourPlayers, theirPlayers } = selectedPlayersForTrade;
 
         const updatedTeams = teamsData.map((team) => {
-            if (team.name === userTeam.name) {// teamOrder[currentPickIndex]?.teamName) {
+            if (team.name === userTeam.name) {
                 return {
                     ...team,
                     picks: team.picks
@@ -156,14 +136,10 @@ const DraftPage = () => {
                 .sort((a, b) => a.pick - b.pick)
         );
 
-        // Reset selections
         setSelectedPicksForTrade({ yourPicks: [], theirPicks: [] });
         setSelectedPlayersForTrade({ yourPlayers: [], theirPlayers: [] });
     };
 
-    /**
-     * Manages draft state transitions based on the current pick and draft state.
-     */
     useEffect(() => {
         if (currentPickIndex >= teamOrder.length || availablePlayers.length === 0) {
             setDraftState('draft-complete');
@@ -189,15 +165,12 @@ const DraftPage = () => {
                     const bestPlayer = availablePlayers[0];
                     handleDraftPlayer(bestPlayer, currentDraftingTeam.teamName);
                 }
-            }, 1000);
+            }, draftSpeed);
 
             return () => clearTimeout(timer);
         }
-    }, [currentPickIndex, selectedTeams, availablePlayers, draftState, teamOrder]);
+    }, [currentPickIndex, selectedTeams, availablePlayers, draftState, teamOrder, draftSpeed]);
 
-    /**
-     * Filters available players based on the search query and selected position.
-     */
     useEffect(() => {
         const lowerCaseQuery = searchQuery.toLowerCase();
         setFilteredPlayers(
@@ -215,7 +188,7 @@ const DraftPage = () => {
             sx={{
                 display: 'flex',
                 justifyContent: 'center',
-                margin: '40px auto',
+                margin: '10px auto',
                 maxWidth: '80%',
                 height: '100vh',
             }}
@@ -229,24 +202,43 @@ const DraftPage = () => {
                     backgroundColor: 'background.default',
                 }}
             >
-                <Typography variant="h6" gutterBottom>
+                <DraftPageHeader draftSpeed={draftSpeed} setDraftSpeed={setDraftSpeed} />
+
+                {/* <Typography variant="h6" gutterBottom>
                     NHL Mock Draft
-                </Typography>
+                </Typography> */}
                 <Box
                     sx={{
                         display: 'flex',
                         justifyContent: 'space-between',
                         gap: 3,
-                        height: '100%',
+                        height: 'calc(100% - 60px)',
                     }}
                 >
-                    {/* Draft Selections: 1/3 of the width */}
-                    <Box sx={{ flex: 1 }}>
+                    <Box
+                        sx={{
+                            flex: 1,
+                            overflowY: 'auto',
+                            maxHeight: 'calc(100% - 20px)',
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                            padding: 2,
+                        }}
+                    >
                         <DraftSelections draftSelections={draftSelections} />
                     </Box>
-
-                    {/* Draft View: 2/3 of the width */}
-                    <Box sx={{ flex: 2 }}>
+                    <Box
+                        sx={{
+                            flex: 2,
+                            overflowY: 'auto',
+                            maxHeight: 'calc(100% - 20px)',
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                            padding: 2,
+                        }}
+                    >
                         <DraftView
                             filteredPlayers={filteredPlayers}
                             handleDraftPlayer={handleDraftPlayer}

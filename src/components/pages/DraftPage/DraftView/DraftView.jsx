@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import GenericBanner from './GenericBanner';
-import TradeControls from './TradeControls';
+import TradeControls from './TradeControls/TradeControls';
 import TeamInfo from './TeamInfo';
 import DraftTabs from './DraftTabs';
-import InBetweenPicks from './InBetweenPicks';
-import DraftStateControls from './DraftStateControls';
+import InBetweenPicks from '../InBetweenPicks';
+import DraftStateControls from '../DraftStateControls';
 
 const DraftView = ({
     filteredPlayers,

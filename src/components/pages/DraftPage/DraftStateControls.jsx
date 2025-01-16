@@ -14,35 +14,70 @@ const DraftStateControls = ({
         <Box
             sx={{
                 display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                marginTop: 3,
+                flexDirection: draftState === 'in-between-picks' ? 'column' : 'row',
+                justifyContent: 'center', // Center-align the buttons
+                alignItems: 'center',
+                gap: 3, // Increase gap between buttons
+                marginTop: 4,
             }}
         >
             {draftState === 'pre-draft' && (
                 <>
-                    <SecondaryButton onClick={handleTrade}>
+                    <SecondaryButton
+                        onClick={handleTrade}
+                        sx={{
+                            width: '300px', // Make buttons wider
+                            textAlign: 'center', // Center-align text
+                        }}
+                    >
                         Offer Trade
                     </SecondaryButton>
-                    <MainButton onClick={startDraft}>Start Draft</MainButton>
+                    <MainButton
+                        onClick={startDraft}
+                        sx={{
+                            width: '300px',
+                            textAlign: 'center',
+                        }}
+                    >
+                        Start Draft
+                    </MainButton>
                 </>
             )}
 
             {draftState === 'paused' && (
                 <>
-                    <SecondaryButton onClick={handleTrade}>
+                    <SecondaryButton
+                        onClick={handleTrade}
+                        sx={{
+                            width: '300px',
+                            textAlign: 'center',
+                        }}
+                    >
                         Offer Trade
                     </SecondaryButton>
-                    <MainButton onClick={resumeDraft}>Resume Draft</MainButton>
+                    <MainButton
+                        onClick={resumeDraft}
+                        sx={{
+                            width: '300px',
+                            textAlign: 'center',
+                        }}
+                    >
+                        Resume Draft
+                    </MainButton>
                 </>
             )}
 
             {draftState === 'in-between-picks' && (
-                <>
-                    <MainButton onClick={pauseDraft}>
-                        Pause & Offer Trade
-                    </MainButton>
-                </>
+                <MainButton
+                    onClick={pauseDraft}
+                    sx={{
+                        width: '400px', // Make the single button wider
+                        textAlign: 'center',
+                        padding: '16px', // Increase padding for emphasis
+                    }}
+                >
+                    Pause & Offer Trade
+                </MainButton>
             )}
         </Box>
     );

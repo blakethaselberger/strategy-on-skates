@@ -1,9 +1,9 @@
 import React from 'react';
 import { Typography, Container, Grid2, Box } from '@mui/material';
-import NHLStandings from '../tables/NHLStandings';
-import NHLLeadingScorers from '../tables/NHLLeadingScorers';
-import PlayerTrends from '../common/PlayerTrends';
-import DraftRankings from '../tables/DraftRankings';
+import NHLStandings from '../../tables/NHLStandings';
+import NHLLeadingScorers from '../../tables/NHLLeadingScorers';
+import PlayerTrends from '../../common/PlayerTrends';
+import DraftRankings from '../../tables/DraftRankings';
 
 const Home = () => {
     return (

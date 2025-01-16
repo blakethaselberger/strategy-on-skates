@@ -18,8 +18,6 @@ const SecondaryButton = ({ children, onClick, disabled, ...props }) => {
                 color: 'hsl(210, 85%, 50%)', // Blue text
                 borderWidth: 2, // Thicker border for emphasis
                 borderColor: 'hsl(210, 85%, 50%)', // Blue outline color
-                width: '100%', // Fill parent container
-                boxSizing: 'border-box', // Ensure padding doesn't affect width
                 '&:hover': {
                     backgroundColor: 'hsl(210, 85%, 95%)', // Subtle blue background on hover
                     borderWidth: 2, // Maintain border width on hover

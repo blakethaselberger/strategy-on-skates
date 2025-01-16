@@ -16,8 +16,6 @@ const MainButton = ({ children, onClick, disabled, ...props }) => {
                 fontSize: '1rem', // Font size adjustment
                 borderRadius: 2, // Square appearance
                 color: 'white', // White text for contrast
-                width: '100%', // Fill parent container
-                boxSizing: 'border-box', // Ensure padding doesn't affect width
                 ...props.sx, // Allow overriding styles via props
             }}
         >
